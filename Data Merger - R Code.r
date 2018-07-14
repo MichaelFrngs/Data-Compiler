@@ -1,6 +1,6 @@
 setwd("C:/Users/mfrangos/Desktop/R")
 library(dplyr) #Loads the dplyr library.
-library(plyr)  #Allows for ddply function on line 65
+library(plyr)  #Allows for ddply functions 
 options(max.print=1000000)
 
 #Before running this code, delete filler/empty rows in csv files at the top and bottom rows to clean data. Also change to number font types to NUMBER
