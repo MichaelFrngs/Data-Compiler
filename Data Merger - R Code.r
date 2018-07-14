@@ -1,4 +1,4 @@
-setwd("C:/Users/mfrangos2016/Desktop/R")
+setwd("C:/Users/mfrangos/Desktop/R")
 library(dplyr) #Loads the dplyr library.
 library(plyr)  #Allows for ddply function on line 65
 options(max.print=1000000)
