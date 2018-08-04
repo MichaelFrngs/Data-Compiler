@@ -3,7 +3,7 @@ library(dplyr) #Loads the dplyr library.
 library(plyr)  #Allows for ddply function
 options(max.print=1000000)
 
-#Before running this code, delete filler/empty rows in csv files at the top and bottom rows to clean data. 
+#Before running this code, clean the data and ensure there are no null cells.
 #Change Data types to numbers
 
 
