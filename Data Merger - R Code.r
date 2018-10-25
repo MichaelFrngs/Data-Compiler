@@ -1,18 +1,10 @@
-setwd("C:/Users/mfrangos/Desktop/R")
+setwd("C:/Users/mfrangos2016/Desktop/R/Leap Ahead Data Merger")
 library(dplyr) #Loads the dplyr library.
-library(plyr)  #Allows for ddply function
+library(plyr)  #Allows for ddply functions
+
 options(max.print=1000000)
 
-#Before running this code, clean the data and ensure there are no null cells.
-#Change Data types to numbers
-
-
-#This section Organizes leapahead csv files 
-#------------------------------------------------------------------
-##THIS SECTION READS LEAPAHEAD'S "Receivable Account Detail (ODS PROD)" Report
-##The Report must be sorted by X.iD when using leapahead ERP.
-
-AllBalanceData = data.frame(read.csv("Input Tsaarev 7-27-18.csv")) #creates dataframe from leapahead file
+AllBalanceData = data.frame(read.csv("Input Tsaarev 10-17-18.csv")) #creates dataframe from leapahead file
 
 
 
@@ -21,17 +13,33 @@ names(AllBalanceData) = c("X.ID",  "X.Line.Cnt","NAME","X.ID.1","X.ACADEMIC_PERI
                           "X.CATEGORY","X.CATEGORY_DESC","X.ENTRY_DATE","X.AMOUNT","X.BALANCE","X.TRANSACTION_DESC")
 
 
-#str(AllBalanceData$BALANCE)  #Checks the dataclass type
-AllBalanceData$X.BALANCE #PRINT COLUMN
+FilteredFees1 = AllBalanceData %>%
+select(X.ID.1, X.CATEGORY, X.AMOUNT,X.TRANSACTION_DESC ) %>%
+filter(X.TRANSACTION_DESC =="Owl Card Replacement"| X.TRANSACTION_DESC =="FAU Campus Bookstore"| X.TRANSACTION_DESC =="Short Term Advance Processing "| X.TRANSACTION_DESC =="Student Health Services       "| X.TRANSACTION_DESC =="2118000864-FL-TEE51 "| X.TRANSACTION_DESC =="Student Health Services"| X.TRANSACTION_DESC =="eLearning Fee"| X.TRANSACTION_DESC =="Online MBA Fees"| X.TRANSACTION_DESC =="Executive Program Local Fees"| X.TRANSACTION_DESC =="Executive MBA Fees"| X.TRANSACTION_DESC =="EMBA-Instructional Materials"| X.TRANSACTION_DESC =="Professional MBA Fee"| X.TRANSACTION_DESC =="Online MHA Fees"| X.TRANSACTION_DESC =="Executive MHA Fees"| X.TRANSACTION_DESC =="EMHA-Instructional Materials"| X.TRANSACTION_DESC =="PMBA-Instructional Materials"| X.TRANSACTION_DESC =="Grad Student Orientation Fee"| X.TRANSACTION_DESC =="Master of Finance Fees"| X.TRANSACTION_DESC =="Tuition Differential"| X.TRANSACTION_DESC =="MSF-Instructional Materials"| X.TRANSACTION_DESC =="Financial Analyst Program Fees"| X.TRANSACTION_DESC =="Online BBA eLearning Fee"| X.TRANSACTION_DESC =="Five Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Three Installmt. Pymt Plan Fee"| X.TRANSACTION_DESC =="Six Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Four Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Install Plan Set Up Fee 50/50"| X.TRANSACTION_DESC =="Owl Card"| X.TRANSACTION_DESC =="Transportation Access Fee"| X.TRANSACTION_DESC =="Invalid Bank Account # Charge"| X.TRANSACTION_DESC =="Returned Check Serv. Charge 5%"| X.TRANSACTION_DESC =="Dishonored Wck Incorrect Acct"| X.TRANSACTION_DESC =="Dishonored Web Check 5%"| X.TRANSACTION_DESC =="Returned Check 5% Serv. Charge"| X.TRANSACTION_DESC =="Short Term Loan Advance       "| X.TRANSACTION_DESC =="Financial Aid Refund"| X.TRANSACTION_DESC =="Refund Distribution"| X.TRANSACTION_DESC =="Athletics Scholarship Advance"| X.TRANSACTION_DESC =="Short Term Advance"| X.TRANSACTION_DESC =="Out of State Tuition&Fees-GR"| X.TRANSACTION_DESC =="Out of State Non Resident-GR"| X.TRANSACTION_DESC =="Out of State Financial Aid-GR"| X.TRANSACTION_DESC =="Out of State Tuition&Fees-UG"| X.TRANSACTION_DESC =="Out of State Financial Aid-UG"| X.TRANSACTION_DESC =="Out of State Non Resident-UG"| X.TRANSACTION_DESC =="Out of State Tuition&FeesEL-GR"| X.TRANSACTION_DESC =="OutofState Financial Aid EL-GR"| X.TRANSACTION_DESC =="Out of State Non Res EL-GR"| X.TRANSACTION_DESC =="Out of State Tuition&FeesEL-UG"| X.TRANSACTION_DESC =="Out of State Non Res EL-UG"| X.TRANSACTION_DESC =="OutofState Financial Aid EL-UG"| X.TRANSACTION_DESC =="Fla.Res.Tuition&FeesEL-GR"| X.TRANSACTION_DESC =="Fla.Res.Tuition&Fees-GR"| X.TRANSACTION_DESC =="Fla.Res.Tuition&Fees-UG"| X.TRANSACTION_DESC =="Out of State Tuition Fee-GR"| X.TRANSACTION_DESC =="Out of State Tuition Fee EL-GR")
+
+#These fees are posted as negative and must be subtracted correctly later.
+FilteredFees2 =   AllBalanceData %>%
+  select(X.ID.1, X.CATEGORY, X.AMOUNT,X.TRANSACTION_DESC ) %>%  
+  filter(X.TRANSACTION_DESC =="Personal Check correction"| X.TRANSACTION_DESC =="VISA correction"| X.TRANSACTION_DESC =="Mastercard correction")
+
+#Flips the sign to negative
+FilteredFees2$X.AMOUNT = FilteredFees2$X.AMOUNT * -1
+
+#merges the two data frames vertically
+FilteredFees = rbind(FilteredFees1, FilteredFees2)         
+         
 
 
 
-#Be sure to set the balance columns as "number" dataclass in excel.
-StudentBalances=data.frame(rowsum(AllBalanceData$X.BALANCE,AllBalanceData$X.ID.1),row.names = NULL)   #Creates the StudentBalances dataframe. Our output.
+
+#Be sure to set the balance column as a "number" in excel. This part of code sums up all the rows into one
+StudentBalances=data.frame(rowsum(AllBalanceData$X.BALANCE,AllBalanceData$X.ID.1),row.names = NULL) 
+#StudentBalances=data.frame(rowsum(FilteredFees$X.AMOUNT,FilteredFees$X.ID.1),row.names = NULL)   #Creates the StudentBalances dataframe. Our output.
+
 str(AllBalanceData$X.BALANCE)
 
-#Sums up all fees
-TotalFees = c(rowsum(AllBalanceData$X.AMOUNT,AllBalanceData$X.ID.1),row.names = NULL)
+#Sums up all fees (OUTDATED)
+#TotalFees = c(rowsum(FilteredFees$X.AMOUNT,FilteredFees$X.ID.1),row.names = NULL)
 
 
 #Removes duplicate names
@@ -50,115 +58,156 @@ BalanceOutputData =  data.frame(StudentBalances)
 BalanceOutputData$ZNumber = BalanceZNumbers
 BalanceOutputData$Names = BalanceNames
 
-#Creates Payment Column
-BalanceOutputData$TotalFees = TotalFees
-
 
 #Renames columns
-names(BalanceOutputData) = c("Balance", "ZNumber" ,"Names", "TotalFees")
+names(BalanceOutputData) = c("Balance", "ZNumber" ,"Names")
+
+
+#Creates Deposit Paid Column
+Deposit = AllBalanceData %>%
+  select(X.ID.1, X.CATEGORY, X.AMOUNT) %>%
+  filter(X.CATEGORY == "DEP")
+
+  #Sets names
+  names(Deposit) = c("ZNumber", "TEMP.Col.Category", "Deposit")
+  #Eliminates temporary column
+  Deposit = Deposit %>% 
+    select(ZNumber,Deposit)
+  #Merges the rows by Z Number to remove duplicates
+  Deposit = data.frame(aggregate(Deposit ~ZNumber , data=Deposit, FUN=sum))
+  BalanceOutputData = merge(Deposit, BalanceOutputData, by="ZNumber", all = TRUE)
+  #Removes NA cells
+  BalanceOutputData[is.na(BalanceOutputData)] = 0 
+
+  
+  
+#Creates Total Payments column (IN PROGRESS) LAST WORKING LINE
+#BalanceOutputData$Payment = (TotalFees-BalanceOutputData$Balance-BalanceOutputData$Deposit)
+
+
+  #Credits
+FilteredPaymentCredits = AllBalanceData %>%
+  select(X.ID.1, X.CATEGORY, X.AMOUNT,X.TRANSACTION_DESC ) %>%
+  filter(X.TRANSACTION_DESC =="memorial healthcare"| X.TRANSACTION_DESC =="Other Party Check"| X.TRANSACTION_DESC =="Personal Check"
+         | X.TRANSACTION_DESC =="Chapter 33 Wire"| X.TRANSACTION_DESC =="Flywire International Payment"|  X.TRANSACTION_DESC =="Discover"
+         | X.TRANSACTION_DESC =="FAU Employees Educ Assistance"| X.TRANSACTION_DESC =="Business Executive Prog Ex"| X.TRANSACTION_DESC =="State Employee Res Exemption"
+         | X.TRANSACTION_DESC =="Undergrad Studies Matric Exemp"| X.TRANSACTION_DESC =="Money Order 3"| X.TRANSACTION_DESC =="FA Refund Ck Voided-Crd to AR"
+         | X.TRANSACTION_DESC =="Refund Ck Voided-Crd to AR"| X.TRANSACTION_DESC =="VISA"| X.TRANSACTION_DESC =="Mastercard" | X.TRANSACTION_DESC == "Web Check" 
+         | X.TRANSACTION_DESC == "Florida Prepaid Wire Transfer " | X.TRANSACTION_DESC == "Direct Unsubsidized Loan" 
+         | X.TRANSACTION_DESC == "Athletic Tuition Scholarship" |X.TRANSACTION_DESC == "Pre Post Season Expense" | X.TRANSACTION_DESC == "Direct Grad PLUS Loan" 
+         | X.TRANSACTION_DESC == "American Express" | X.TRANSACTION_DESC == "Alternative Private Loan" | X.TRANSACTION_DESC == "External Scholarship 1" 
+         | X.TRANSACTION_DESC == "Womens Soccer Scholarship" | X.TRANSACTION_DESC == "WSO Cost of Attendance" | X.TRANSACTION_DESC == "Mens Basketball Scholarship" 
+         | X.TRANSACTION_DESC == "Miscellaneous FAU Award" | X.TRANSACTION_DESC == "Football Scholarship" | X.TRANSACTION_DESC == "FB Cost of Attendance" 
+         | X.TRANSACTION_DESC == "Contract Payment" | X.TRANSACTION_DESC == "Football Off Campus" | X.TRANSACTION_DESC == "MBB Cost of Attendance") 
+  
+
+FilteredPaymentCredits =  data.frame(ddply(FilteredPaymentCredits,
+                                           .(X.ID.1),summarize
+                                           ,TotalCredits=sum(X.AMOUNT)))
+
+   
+
+FilteredPaymentDebits1 = AllBalanceData %>%
+  select(X.ID.1, X.CATEGORY, X.AMOUNT,X.TRANSACTION_DESC ) %>%
+  filter( X.TRANSACTION_DESC =="Invalid Bank Account # Charge"| X.TRANSACTION_DESC =="Returned Check Serv. Charge 5%"| X.TRANSACTION_DESC =="Dishonored Wck Incorrect Acct"| X.TRANSACTION_DESC =="Dishonored Web Check 5%"| X.TRANSACTION_DESC =="Returned Check 5% Serv. Charge"| X.TRANSACTION_DESC =="Short Term Loan Advance Processing "| X.TRANSACTION_DESC =="Financial Aid Refund"| X.TRANSACTION_DESC =="Refund Distribution"| X.TRANSACTION_DESC =="Short Term Advance")
+
+#For negative credits (in otherwords a debit)
+FilteredPaymentDebits2 = AllBalanceData %>%
+  select(X.ID.1, X.CATEGORY, X.AMOUNT,X.TRANSACTION_DESC ) %>%
+  filter(X.TRANSACTION_DESC =="VISA correction"| X.TRANSACTION_DESC =="Mastercard correction"| X.TRANSACTION_DESC =="Personal Check correction")
+  
+#Flips the sign to negative
+FilteredPaymentDebits2$X.AMOUNT = FilteredPaymentDebits2$X.AMOUNT * -1
+
+#merges the two data frames vertically
+FilteredPaymentDebits = rbind(FilteredPaymentDebits1, FilteredPaymentDebits2) 
+
+FilteredPaymentDebits =  data.frame(ddply(FilteredPaymentDebits,
+                                           .(X.ID.1),summarize
+                                           ,TotalDebits=sum(X.AMOUNT)))
+
+DebitsAndCredits = merge(FilteredPaymentDebits,FilteredPaymentCredits, by="X.ID.1",all=TRUE)
+
+#Removes NA cells and replaces with zero
+DebitsAndCredits[is.na(DebitsAndCredits)] = 0 
+
+DebitsAndCredits$TotalPayments = DebitsAndCredits$TotalCredits - DebitsAndCredits$TotalDebits
+
+
+
+names(DebitsAndCredits) = c("ZNumber", "TotalDebits", "TotalCredits", "TotalPayments")
+
+
+#Removes debits & Credits columns
+DebitsAndCredits2 = data.frame(DebitsAndCredits$ZNumber,DebitsAndCredits$TotalPayments)
+names(DebitsAndCredits2) = c("ZNumber","TotalPayments")
+
+
+BalanceOutputData = merge(DebitsAndCredits2,BalanceOutputData, by="ZNumber", all = TRUE)
+
+
+
+#Creates Total fees Column
+BalanceOutputData$TotalFees = BalanceOutputData$Balance + BalanceOutputData$TotalPayments
+
 
 #Creates percentage paid column
-BalanceOutputData$PercentPaid = (TotalFees-BalanceOutputData$Balance)/TotalFees
+BalanceOutputData$PercentPaid = (BalanceOutputData$TotalFees-BalanceOutputData$Balance)/BalanceOutputData$TotalFees
 
 
+#Removes NA cells
+BalanceOutputData[is.na(BalanceOutputData)] = 0 
 
 
-
-#write.csv(BalanceOutputData, file = "OUTPUTStudentBalances.csv",row.names=TRUE)     #Exports the output as a CSV file
-
- #END OF STUDENT BALANCES CSV PRINTER
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------
-#FINANCIAL AID SECTION
-#FINANCIAL AID SECTION
-#THIS READS LEAPAHEAD'S "Financial Aid Award (ODS PROD)" Report
-
-#Before running, delete filler/empty rows in csv file at the top and bottom rows. Also change number font types to NUMBER
-#Clean up Periods by replacing with zero
-
-#FINANCIAL AID SECTION
-#FINANCIAL AID SECTION
-
-
-FinancialAidData = data.frame(read.csv("Input Financial Aid Award 7-27-18.csv")) #creates dataframe from leapahead file
+FinancialAidData = data.frame(read.csv("Input Financial Aid Award 10-17-18.csv")) #creates dataframe from leapahead file
 
 FinancialAidData$AWARD_ACCEPT_AMOUNT #Print
 
 
 
-#-------------------------------------------------------------------------#
-#-------------------------------------------------------------------------#
-#This adds up all accepted aid amounts and sorts by unique id ("Z#")
+#This adds up all accepted aid amts by z#
 TotalFinancialAidData=ddply(FinancialAidData,
                             .(ID),summarize
                             ,TotalAcceptedFa=sum(AWARD_ACCEPT_AMOUNT)
                             ,TotalOfferedFa=sum(AWARD_OFFER_AMOUNT)
                             ,TotalPaidFa=sum(AWARD_PAID_AMOUNT)
+                            ,TotalDeclinedFa=sum(AWARD_DECLINE_AMOUNT)
                             ,Number_of_Rewards=length(ID)) 
                                                                 #^ Creates column                  #Counts how many z-Numbers ^^^^^
 
-names(TotalFinancialAidData) = c("ZNumber", "FA_Accepted", "FA_Offered", "FA_Paid", "ZnumInstances") #Renames the X.ID Column to ZNumber
+names(TotalFinancialAidData) = c("ZNumber", "FA_Accepted", "FA_Offered", "FA_Paid", "FA_Declined", "ZnumInstances") #Renames the X.ID Column to ZNumber
 TotalFinancialAidData$ZnumInstances = NULL #Deletes the glitch column
 
-#SWITCH BELOW FOR ABOVE TO ORGANIZE OUTPUT FINANCIAL AID DATA BY SOURCE OF FUNDS (subloan, gplus etc)
-#ByAwardTypeData=ddply(FinancialAidData,.(X.ID,X.FUND_TITLE),summarize,sum=sum(X.AWARD_ACCEPT_AMOUNT),ZnumInstances=length(X.ID))
-#names(ByAwardTypeData) = c("ZNumber", "FUND_TITLE", "sum", "ZnumInstances") #Renames the X.ID Column to ZNumber
-#-------------------------------------------------------------------------#
-#-------------------------------------------------------------------------#
+
 FinAidOutputData =  data.frame(TotalFinancialAidData) #prepares output data
 
-#SWITCH BELOW FOR ABOVE LINE TO OUTPUT FINANCIAL AID BY SOURCE OF FUNDS
-#FinAidOutputData =  data.frame(ByAwardTypeData)    #THIS LINE CAN BE SWITCHED
-#-------------------------------------------------------------------------#
-#-------------------------------------------------------------------------#
 
 
-
-#File Export
-#write.csv(FinAidOutputData, file = "FA OUTPUT.csv",row.names=TRUE)     #Exports the output as a CSV file
-#END OF FINANCIAL AID SECTION
-
-
-#-----------------------------------------------------------------------------------------------
-#Merges both report outputs into one dataframe
 CombinedDF = merge(FinAidOutputData, BalanceOutputData, by="ZNumber",all=TRUE)
 
 
 #write.csv(CombinedDF, file = "OutputData - Financial.Aid & Balances.csv",row.names=TRUE)  
 
 
+#Reads data
+AcademicStudyPrimaryData = data.frame(read.csv("Input AcademicStudyPrimaryData 10-17-18.csv")) #creates dataframe from leapahead file
 
 
-
-#####################################################################################################################
-#####################################################################################################################
-#####################################################################################################################
-#####################################################################################################################
-#####################################################################################################################
-#This section manipulates LeapAhead's "Academic Study Primary with GPA(ODS PROD)" Report
-
-AcademicStudyPrimaryData = data.frame(read.csv("Input AcademicStudyPrimaryData 7-27-18.csv")) #creates dataframe from leapahead file
-
-FilteredAcademicStudyPrimaryData = ddply(AcademicStudyPrimaryData                  #Filters data to only include following columns.
-                                         ,.(ID,MAJOR
+#Filters data to only include the following columns. We're picking columns to keep.
+FilteredAcademicStudyPrimaryData = ddply(AcademicStudyPrimaryData                  
+                                         ,.(ID,MAJOR      #First column paramater is what we're filtering by, which is the ZNumber.
                                             ,EMAIL_PREFERRED_ADDRESS
                                             ,VETERAN_TYPE_DESC
+                                            ,ACADEMIC_PERIOD_ADMITTED
+                                            ,TOTAL_CREDITS_ENROLLED
                                          )
                                          ,summarize,ZnumInstances="NULL") 
+   #         ^ Summarize required to remove all other data.
 
-                                                                    #^ First column, becomes what we filter by.                 ^ Summarize required to remove all other data.
 
-names(FilteredAcademicStudyPrimaryData) = c("ZNumber","Major", "Email", "Veteran?", "DeleteCol") #Renames the X.ID Column to ZNumber. Prepares for Z# merge.
-FilteredAcademicStudyPrimaryData$DeleteCol = NULL #Deletes the glitch column
+#Renames the X.ID Column to ZNumber. Prepares for Z# merge.
+names(FilteredAcademicStudyPrimaryData) = c("ZNumber","Major", "Email", "Veteran?","PeriodAdmitted", "Ttl.Credits.Enrolled", "DeleteCol") 
+FilteredAcademicStudyPrimaryData$DeleteCol = NULL #Deletes a glitch column
 
 
 CombinedDF = merge(FilteredAcademicStudyPrimaryData, CombinedDF, by="ZNumber",all=TRUE) #Merges all of the 3 reports into one.
@@ -168,24 +217,9 @@ CombinedDF = merge(FilteredAcademicStudyPrimaryData, CombinedDF, by="ZNumber",al
 
 
 
+RRAAREQ1.Data = data.frame(read.csv("Input FATR - RRAAREQ 10-17-18.csv")) #creates dataframe from leapahead file
 
-
-
-
-
-#####################################################################################################################
-#####################################################################################################################
-#####################################################################################################################
-#####################################################################################################################
-#####################################################################################################################
-#This section manipulates LeapAhead's "Financial Aid Tracking Requirement (ODS PROD) - RRAAREQ" Report
-#Do not use sorting when extracting from the Leapahead database.
-
-
-
-RRAAREQ1.Data = data.frame(read.csv("Input FATR - RRAAREQ 7-27-18.csv")) #creates dataframe from leapahead file
-
-#pREVENTS program from breaking by specifying column names ahead of time
+#pREVENTS program from breaking by specifying column names ahead of times
 names(RRAAREQ1.Data) = c("X.Line.Cnt"                  ,"X.AID_YEAR.1"                ,"X.AID_YEAR_DESC"            
                           ,"X.ID"                     , "X.NAME"                  ,    "X.REQUIREMENT"            ,   "X.REQUIREMENT_DESC"         
                         ,"X.SATISFIED_IND"            ,"X.STATUS"                 ,   "X.STATUS_DESC"             ,  "X.STATUS_DATE"              
@@ -193,8 +227,8 @@ names(RRAAREQ1.Data) = c("X.Line.Cnt"                  ,"X.AID_YEAR.1"          
                          ,"X.MESSAGE"                   ,"X.MESSAGE_DESC"            ,  "X.UNSATISFIED_PROM_NOTE_IND", "X.MORE_SPECIFIC_REQ_IND"    
                          ,"X.EMAIL_PREFERRED"           ,"X.EMAIL_PREFERRED_DESC"     , "X.EMAIL_PREFERRED_ADDRESS"  )
 
-
-
+#Temporary fix
+RRAAREQ1.Data = RRAAREQ1.Data[-c(23:27)]
 
 #Selects the useful information for Entrance couneling column in final output.
 DL_EntranceCounceling = RRAAREQ1.Data %>%
@@ -210,15 +244,6 @@ DL_EntranceCounceling2 = DL_EntranceCounceling %>%
     
     #Merges with final output file
 CombinedDF = merge(DL_EntranceCounceling2 , CombinedDF, by="ZNumber",all=TRUE)
-  
-  
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
 
 #Switch ID to X.ID sometimes. As well as other column names.
 GPL_EntranceCounceling = RRAAREQ1.Data %>%
@@ -235,15 +260,6 @@ GPL_EntranceCounceling2 = GPL_EntranceCounceling %>%
 #Merges with final output file
 CombinedDF = merge(GPL_EntranceCounceling2 , CombinedDF, by="ZNumber",all=TRUE)
  
-
-
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
 
 Citizenship = RRAAREQ1.Data %>%
   select(X.ID, X.REQUIREMENT_DESC, X.STATUS_DESC) %>%
@@ -262,15 +278,6 @@ CombinedDF = merge(Citizenship2 , CombinedDF, by="ZNumber",all=TRUE)
 
 
 
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-
-
 #Switch ID to X.ID Sometimes
 SelectiveService = RRAAREQ1.Data %>%
   select(X.ID, X.REQUIREMENT_DESC, X.STATUS_DESC) %>%
@@ -287,17 +294,11 @@ SelectiveService2 = SelectiveService %>%
 CombinedDF = merge(SelectiveService2 , CombinedDF, by="ZNumber",all=TRUE)
 
 
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
 
+#Selects the following columns and only keeps the rows with "Fed.Aid Application"
 FAFSA = RRAAREQ1.Data %>%
-  select(X.ID, X.REQUIREMENT_DESC, X.STATUS_DESC) %>%
-  filter(X.REQUIREMENT_DESC == "Fed. Aid Application")
+  select(X.ID, X.REQUIREMENT_DESC, X.STATUS_DESC) %>%          #Selects columns
+  filter(X.REQUIREMENT_DESC == "Fed. Aid Application")        #Filters rows
 
 #Renames columns
 names(FAFSA) = c("ZNumber","ElegibilityRequirement", "FAFSA") #Renames the X.ID Column to ZNumber. Prepares for Z# merge.  
@@ -310,24 +311,78 @@ FAFSA2 = FAFSA %>%
 CombinedDF = merge(FAFSA2 , CombinedDF, by="ZNumber",all=TRUE)
 
 
+#OTHER OUTSTANDING REQUIREMENT RRAAREQ COLUMN
+All.FA.Requirements1 = RRAAREQ1.Data %>%
+  select(X.ID, X.REQUIREMENT, X.STATUS) %>%          #Selects columns
+  filter(  X.REQUIREMENT == "ADNMGP"
+         | X.REQUIREMENT == "BNKRPT"
+         | X.REQUIREMENT == "CERT"
+         | X.REQUIREMENT == "CONCUR"
+         | X.REQUIREMENT == "DEFLT"
+         | X.REQUIREMENT == "DHS"
+         | X.REQUIREMENT == "ENRHIS"
+         | X.REQUIREMENT == "ENTR"
+         | X.REQUIREMENT == "GPENTR"
+         | X.REQUIREMENT == "HSCH"
+         | X.REQUIREMENT == "ISIR"
+         | X.REQUIREMENT == "ISIRDC"
+         | X.REQUIREMENT == "ISIRRJ"
+         | X.REQUIREMENT == "NFI13"
+         | X.REQUIREMENT == "NFI16"
+         | X.REQUIREMENT == "NOGRAD"
+         | X.REQUIREMENT == "SERV"
+         | X.REQUIREMENT == "SSA"
+         | X.REQUIREMENT == "SSCARD"
+         | X.REQUIREMENT == "TMALRT"
+         | X.REQUIREMENT == "V5PX16"
+         | X.REQUIREMENT == "V5SX16"
+         | X.REQUIREMENT == "VDEPV4"
+         | X.REQUIREMENT == "VDEPV5"
+         | X.REQUIREMENT == "VENFI5"
+         | X.REQUIREMENT == "VENFI6"
+         | X.REQUIREMENT == "VENFI7"
+         | X.REQUIREMENT == "VENFI8"
+         | X.REQUIREMENT == "VENFI9"
+         | X.REQUIREMENT == "VER5AI"
+         | X.REQUIREMENT == "VER5AS"
+         | X.REQUIREMENT == "VER5M9"
+         | X.REQUIREMENT == "VER5NI"
+         | X.REQUIREMENT == "VER5SP"
+         | X.REQUIREMENT == "VINDV4"
+         | X.REQUIREMENT == "VINDV5"
+         )       
 
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#LEAP AHEAD'S SATISFACTORY ACADEMIC PROGRESS ODS
-#LEAP AHEAD'S SATISFACTORY ACADEMIC PROGRESS ODS
-#LEAP AHEAD'S SATISFACTORY ACADEMIC PROGRESS ODS
-#LEAP AHEAD'S SATISFACTORY ACADEMIC PROGRESS ODS
+#Filters and keeps only the required financial aid items, as opposed to satisfied items.
+All.FA.Requirements2 = RRAAREQ1.Data %>%
+  select(X.ID, X.REQUIREMENT, X.STATUS) %>%          #Selects columns
+  filter(  X.STATUS == "R" | X.STATUS == "D"| X.STATUS == "U" | X.STATUS == "V" | X.STATUS == "Z")
 
 
-#Reads ERP Report
-SapData = data.frame(read.csv("Input SAP 7-27-18.csv"))
 
-#Premptively sets names of columns to prevent variable names from breaking the program
+
+#Merges the requirement rows by Z Number and concatenates them.
+All.FA.Requirements3 = data.frame(aggregate(X.REQUIREMENT ~X.ID , data=All.FA.Requirements2, paste, sep=",", collapse = ", "))
+
+
+
+
+
+#Renames columns
+names(All.FA.Requirements3) = c("ZNumber","All.FA.Requirements") #Renames the X.ID Column to ZNumber. Prepares for Z# merge.  
+
+
+#Merges with final output file
+CombinedDF = merge(All.FA.Requirements3 , CombinedDF, by="ZNumber",all=TRUE)
+
+
+
+
+
+#WHEN DOWNLOADING THIS REPORT, DON'T PUT ANY FILTERS ON LEAPAHEAD
+
+SapData = data.frame(read.csv("Input SAP 10-17-18.csv"))
+
+#Premptively sets names of columns to prevent leapahead from breaking the program
 names(SapData) = c(                         "Line.Cnt",                    "ACADEMIC_PERIOD",             "ACADEMIC_PERIOD_DESC"       
                    ,"NAME" ,                       "ID.1" ,                       "AID_YEAR",                    "AID_YEAR_DESC"              
                    ,"SATISFACTORY_ACAD_PROG_CODE", "SATISFACTORY_ACAD_PROG_DESC")
@@ -343,84 +398,84 @@ names(UsefulSapData) = c("S.A.P", "ZNumber")
 CombinedDF = merge(UsefulSapData , CombinedDF, by="ZNumber",all=TRUE)
 
 
-
-
-
-
-
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-
 #Leap Ahead - Alternate Names or IDs (with Telephone) REPORT
-#UNDER CONSTRUCTION
 
-
+#Reads data
 Spaiden.Data = data.frame(read.csv("Input Alt Names & Phones 7-18-18.csv"))
 
-#names(Spaiden.Data) = c("SPRIDEN_NTYP_CODE",   "LineCnt, SPRIDEN_ID", "SPRIDEN_NTYP_CODE2" , "SPRIDEN_CHANGE_IND", "SPRIDEN_FIRST_NAME",
-#         "SPRIDEN_MI",   "SPRIDEN_LAST_NAME",            "SPRIDEN_SURNAME_PREFIX",           "BIRTH_DATE",   "SPBPERS_CONFID_IND",         
-#          "SPBPERS_DEAD_IND", "SPRIDEN_ENTITY_IND",         "SPRIDEN_ACTIVITY_DATE",   "SPRIDEN_USER",            "SPRIDEN_ORIGIN",     
-#          "SPRTELE_SEQNO",       "SPRTELE_TELE_CODE",            "AreaCode",            "PhoneMidExtension",   "LONG_PHONE_EXT")
-
-
+#Deletes all data except the selected columns
 Phone.Data = Spaiden.Data %>%
   select (SPRIDEN_ID,SPRTELE_PHONE_AREA, SPRTELE_PHONE_NUMBER)
 
+#Sets names of columns
 names(Phone.Data) = c("ZNumber", "AreaCode","PhoneMidExtension")
 
 
-
+#Concatonates two columns into one column. Combines area code & rest of phone #
 PhoneNumbers = data.frame(paste(Phone.Data$AreaCode, Phone.Data$PhoneMidExtension))
-names(PhoneNumbers) = "PhoneNumber"
+names(PhoneNumbers) = "PhoneNumber" #Changes name of column
 
-
+#Creates Z# column and keeps phonenumber column from phone report
 PhoneNumOutput = PhoneNumbers %>%
-  select(PhoneNumber) %>%
+  select(PhoneNumber) %>% #Selects PhoneNumber column inside of PhoneNumOutput.
   mutate(PhoneNumOutput, ZNumber = Phone.Data$ZNumber) 
+
+PhoneNumOutput = PhoneNumOutput[!duplicated(PhoneNumOutput["ZNumber"]),] #Removes duplicates from the data
  
 
-
-CombinedDF = merge(PhoneNumOutput, CombinedDF)
-
-
+#Merges data. NOTE: all.x = TRUE prevents extra phone number data to create new rows in CombinedDF
+CombinedDF = merge(CombinedDF,PhoneNumOutput, by="ZNumber", all.x = TRUE)
 
 
 
 
 
-
-
-
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
-#######################################################
 #IMPORT COMMENTS FROM A FILE
-
-
 Comment.Data = data.frame(read.csv("Comment Data and Other.csv")) #creates dataframe from leapahead file
-
-
-
+merges comment data by Z#
 CombinedDF = merge(Comment.Data , CombinedDF, by="ZNumber",all=TRUE)
 
 
+CombinedDF = CombinedDF[!duplicated(CombinedDF["ZNumber"]),] #Removes duplicates from the data
+rownames(CombinedDF) =  1:nrow(CombinedDF) #AutoNumbers the first column
 
 #Reorder columns in this order
-#CombinedDF = CombinedDF[,c(1,10,11,17,16,3,5,6,7,8,9,12,13,14,15,2,4)]
+CombinedDF = CombinedDF[ ,c(match("ZNumber"            ,names(CombinedDF))
+                           ,match("Major"              ,names(CombinedDF))
+                           ,match("Names"              ,names(CombinedDF))
+                           ,match("Email"              ,names(CombinedDF))
+                           ,match("Balance"            ,names(CombinedDF))
+                           ,match("TotalPayments"            ,names(CombinedDF))
+                           ,match("Deposit"            ,names(CombinedDF))
+                           ,match("PercentPaid"        ,names(CombinedDF))
+                           ,match("TotalFees"          ,names(CombinedDF))       
+                           ,match("PhoneNumber"        ,names(CombinedDF))
+                           ,match("S.A.P"              ,names(CombinedDF))
+                           ,match("FAFSA"              ,names(CombinedDF))
+                           ,match("SelectiveService"   ,names(CombinedDF))
+                           ,match("Citizenship"        ,names(CombinedDF))
+                           ,match("GradPLUSEntrance"   ,names(CombinedDF))
+                           ,match("DirectLoanEntrance" ,names(CombinedDF))
+                           ,match("All.FA.Requirements",names(CombinedDF))
+                           ,match("Veteran?"           ,names(CombinedDF))
+                           ,match("FA_Accepted"        ,names(CombinedDF))
+                           ,match("FA_Offered"         ,names(CombinedDF))
+                           ,match("FA_Paid"            ,names(CombinedDF))
+                           ,match("FA_Declined"            ,names(CombinedDF))
+                           ,match("PeriodAdmitted"     ,names(CombinedDF))
+                           ,match("Ttl.Credits.Enrolled"     ,names(CombinedDF))
+                           
+#                           ,match("Comment"            ,names(CombinedDF))
+#                           ,match("Action"             ,names(CombinedDF))
+)]
+
+
+#Reads data
+MOP.Data = data.frame(read.csv("Fall 2018 MOP and Fee.S.ExecPrograms.csv"))
+MOP.Data = MOP.Data[!duplicated(MOP.Data["ZNumber"]),] #Removes duplicates from the data
+CombinedDF = merge(CombinedDF, MOP.Data, by="ZNumber", all.x = TRUE)
 
 
 
 
-
-
-
-
-write.csv(CombinedDF, file = "FinalOutputData - All Merged Data.csv",row.names=TRUE)  
+write.csv(CombinedDF, file = "FinalOutput - All Merged Data.csv",row.names=TRUE)  
