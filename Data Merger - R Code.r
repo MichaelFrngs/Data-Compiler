@@ -378,7 +378,7 @@ CombinedDF = merge(All.FA.Requirements3 , CombinedDF, by="ZNumber",all=TRUE)
 
 
 
-#WHEN DOWNLOADING THIS REPORT, DON'T PUT ANY FILTERS ON LEAPAHEAD
+
 
 SapData = data.frame(read.csv("Input SAP 10-17-18.csv"))
 
