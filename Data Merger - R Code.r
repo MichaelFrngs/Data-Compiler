@@ -4,7 +4,34 @@ names(AllBalanceData) = c("X.ID",  "X.Line.Cnt","NAME","X.ID.1","X.ACADEMIC_PERI
                           "X.CATEGORY","X.CATEGORY_DESC","X.ENTRY_DATE","X.AMOUNT","X.BALANCE","X.TRANSACTION_DESC")
 FilteredFees1 = AllBalanceData %>%
 select(X.ID.1, X.CATEGORY, X.AMOUNT,X.TRANSACTION_DESC ) %>%
-filter(X.TRANSACTION_DESC =="Owl Card Replacement"| X.TRANSACTION_DESC =="FAU Campus Bookstore"| X.TRANSACTION_DESC =="Short Term Advance Processing "| X.TRANSACTION_DESC =="Student Health Services       "| X.TRANSACTION_DESC =="2118000864-FL-TEE51 "| X.TRANSACTION_DESC =="Student Health Services"| X.TRANSACTION_DESC =="eLearning Fee"| X.TRANSACTION_DESC =="Online MBA Fees"| X.TRANSACTION_DESC =="Executive Program Local Fees"| X.TRANSACTION_DESC =="Executive MBA Fees"| X.TRANSACTION_DESC =="EMBA-Instructional Materials"| X.TRANSACTION_DESC =="Professional MBA Fee"| X.TRANSACTION_DESC =="Online MHA Fees"| X.TRANSACTION_DESC =="Executive MHA Fees"| X.TRANSACTION_DESC =="EMHA-Instructional Materials"| X.TRANSACTION_DESC =="PMBA-Instructional Materials"| X.TRANSACTION_DESC =="Grad Student Orientation Fee"| X.TRANSACTION_DESC =="Master of Finance Fees"| X.TRANSACTION_DESC =="Tuition Differential"| X.TRANSACTION_DESC =="MSF-Instructional Materials"| X.TRANSACTION_DESC =="Financial Analyst Program Fees"| X.TRANSACTION_DESC =="Online BBA eLearning Fee"| X.TRANSACTION_DESC =="Five Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Three Installmt. Pymt Plan Fee"| X.TRANSACTION_DESC =="Six Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Four Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Install Plan Set Up Fee 50/50"| X.TRANSACTION_DESC =="Owl Card"| X.TRANSACTION_DESC =="Transportation Access Fee"| X.TRANSACTION_DESC =="Invalid Bank Account # Charge"| X.TRANSACTION_DESC =="Returned Check Serv. Charge 5%"| X.TRANSACTION_DESC =="Dishonored Wck Incorrect Acct"| X.TRANSACTION_DESC =="Dishonored Web Check 5%"| X.TRANSACTION_DESC =="Returned Check 5% Serv. Charge"| X.TRANSACTION_DESC =="Short Term Loan Advance       "| X.TRANSACTION_DESC =="Financial Aid Refund"| X.TRANSACTION_DESC =="Refund Distribution"| X.TRANSACTION_DESC =="Athletics Scholarship Advance"| X.TRANSACTION_DESC =="Short Term Advance"| X.TRANSACTION_DESC =="Out of State Tuition&Fees-GR"| X.TRANSACTION_DESC =="Out of State Non Resident-GR"| X.TRANSACTION_DESC =="Out of State Financial Aid-GR"| X.TRANSACTION_DESC =="Out of State Tuition&Fees-UG"| X.TRANSACTION_DESC =="Out of State Financial Aid-UG"| X.TRANSACTION_DESC =="Out of State Non Resident-UG"| X.TRANSACTION_DESC =="Out of State Tuition&FeesEL-GR"| X.TRANSACTION_DESC =="OutofState Financial Aid EL-GR"| X.TRANSACTION_DESC =="Out of State Non Res EL-GR"| X.TRANSACTION_DESC =="Out of State Tuition&FeesEL-UG"| X.TRANSACTION_DESC =="Out of State Non Res EL-UG"| X.TRANSACTION_DESC =="OutofState Financial Aid EL-UG"| X.TRANSACTION_DESC =="Fla.Res.Tuition&FeesEL-GR"| X.TRANSACTION_DESC =="Fla.Res.Tuition&Fees-GR"| X.TRANSACTION_DESC =="Fla.Res.Tuition&Fees-UG"| X.TRANSACTION_DESC =="Out of State Tuition Fee-GR"| X.TRANSACTION_DESC =="Out of State Tuition Fee EL-GR")
+filter(X.TRANSACTION_DESC =="Owl Card Replacement"| X.TRANSACTION_DESC =="FAU Campus Bookstore"
+       | X.TRANSACTION_DESC =="Short Term Advance Processing "| X.TRANSACTION_DESC =="Student Health Services       "
+       | X.TRANSACTION_DESC =="2118000864-FL-TEE51 "| X.TRANSACTION_DESC =="Student Health Services"
+       | X.TRANSACTION_DESC =="eLearning Fee"| X.TRANSACTION_DESC =="Online MBA Fees"
+       | X.TRANSACTION_DESC =="Executive Program Local Fees"| X.TRANSACTION_DESC =="Executive MBA Fees"
+       | X.TRANSACTION_DESC =="EMBA-Instructional Materials"| X.TRANSACTION_DESC =="Professional MBA Fee"
+       | X.TRANSACTION_DESC =="Online MHA Fees"| X.TRANSACTION_DESC =="Executive MHA Fees"
+       | X.TRANSACTION_DESC =="EMHA-Instructional Materials"| X.TRANSACTION_DESC =="PMBA-Instructional Materials"
+       | X.TRANSACTION_DESC =="Grad Student Orientation Fee"| X.TRANSACTION_DESC =="Master of Finance Fees"
+       | X.TRANSACTION_DESC =="Tuition Differential"| X.TRANSACTION_DESC =="MSF-Instructional Materials"
+       | X.TRANSACTION_DESC =="Financial Analyst Program Fees"| X.TRANSACTION_DESC =="Online BBA eLearning Fee"
+       | X.TRANSACTION_DESC =="Five Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Three Installmt. Pymt Plan Fee"
+       | X.TRANSACTION_DESC =="Six Payment Plan Set Up Fee"| X.TRANSACTION_DESC =="Four Payment Plan Set Up Fee"
+       | X.TRANSACTION_DESC =="Install Plan Set Up Fee 50/50"| X.TRANSACTION_DESC =="Owl Card"
+       | X.TRANSACTION_DESC =="Transportation Access Fee"| X.TRANSACTION_DESC =="Invalid Bank Account # Charge"
+       | X.TRANSACTION_DESC =="Returned Check Serv. Charge 5%"| X.TRANSACTION_DESC =="Dishonored Wck Incorrect Acct"
+       | X.TRANSACTION_DESC =="Dishonored Web Check 5%"| X.TRANSACTION_DESC =="Returned Check 5% Serv. Charge"
+       | X.TRANSACTION_DESC =="Short Term Loan Advance       "| X.TRANSACTION_DESC =="Financial Aid Refund"
+       | X.TRANSACTION_DESC =="Refund Distribution"| X.TRANSACTION_DESC =="Athletics Scholarship Advance"
+       | X.TRANSACTION_DESC =="Short Term Advance"| X.TRANSACTION_DESC =="Out of State Tuition&Fees-GR"
+       | X.TRANSACTION_DESC =="Out of State Non Resident-GR"| X.TRANSACTION_DESC =="Out of State Financial Aid-GR"
+       | X.TRANSACTION_DESC =="Out of State Tuition&Fees-UG"| X.TRANSACTION_DESC =="Out of State Financial Aid-UG"
+       | X.TRANSACTION_DESC =="Out of State Non Resident-UG"| X.TRANSACTION_DESC =="Out of State Tuition&FeesEL-GR"
+       | X.TRANSACTION_DESC =="OutofState Financial Aid EL-GR"| X.TRANSACTION_DESC =="Out of State Non Res EL-GR"
+       | X.TRANSACTION_DESC =="Out of State Tuition&FeesEL-UG"| X.TRANSACTION_DESC =="Out of State Non Res EL-UG"
+       | X.TRANSACTION_DESC =="OutofState Financial Aid EL-UG"| X.TRANSACTION_DESC =="Fla.Res.Tuition&FeesEL-GR"
+       | X.TRANSACTION_DESC =="Fla.Res.Tuition&Fees-GR"| X.TRANSACTION_DESC =="Fla.Res.Tuition&Fees-UG"
+       | X.TRANSACTION_DESC =="Out of State Tuition Fee-GR"| X.TRANSACTION_DESC =="Out of State Tuition Fee EL-GR")
 
 #These fees are posted as negative and must be subtracted correctly later.
 FilteredFees2 =   AllBalanceData %>%
