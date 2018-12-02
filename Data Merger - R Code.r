@@ -1,4 +1,4 @@
-AllBalanceData = data.frame(read.csv("Input Tsaarev 10-17-18.csv")) #creates dataframe from leapahead file
+AllBalanceData = data.frame(read.csv("Input 10-17-18.csv")) #creates dataframe from leapahead file
 #Prevents program from breaking by specifying column names ahead of time.
 names(AllBalanceData) = c("X.ID",  "X.Line.Cnt","NAME","X.ID.1","X.ACADEMIC_PERIOD" ,"X.DETAIL_CODE","X.DETAIL_CODE_DESC", "X.DETAIL_CODE_TYPE",
                           "X.CATEGORY","X.CATEGORY_DESC","X.ENTRY_DATE","X.AMOUNT","X.BALANCE","X.TRANSACTION_DESC")
